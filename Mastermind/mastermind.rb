@@ -21,20 +21,16 @@ end
 
 class Computer
   attr_accessor :code
-
   def code_generator
     colors = %w[r y g p b m]
 
-    code = colors.sample(4)
+    return code = colors.sample(4)
 
-    puts code
   end
 end
 
 class Player
   attr_accessor :guess
-
-
   def player_guess
     loop do
       print 'Guess:'
@@ -43,13 +39,12 @@ class Player
 
       guess = gets.chomp.strip.split(',')
 
-      if guess.any? { |char| colors.include?(char) } && guess.length.between?(1, 4)
-        break
+      if guess.any? { |char| colors.include?(char) } && guess.length == 4
+        return guess
       else
         puts 'invalid input'
       end
     end
-    guess
   end
 end
 
@@ -65,8 +60,15 @@ class Game
   def start
     board.display
     board.select_color
-    computer.code_generator
-    player1.player_guess
+    
+
+
+    loop do 
+      code = computer.code_generator
+      guess = player1.player_guess
+      puts guess
+      puts code
+    end
   end
 end
 
@@ -76,3 +78,5 @@ def main
 end
 
 main
+
+# test: r,r,r,r 
