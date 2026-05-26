@@ -69,13 +69,11 @@ class Game
     w = 0
 
     guess.each_with_index do |value, index|
-      next unless value == code[index]
-
-      g += 1
-
-      next if value != code[index]
-
-      w += 1 if code.include?(value)
+      if value == code[index]
+        g += 1
+      elsif code.include?(value)
+        w += 1
+      end
     end
 
     [g, w]
@@ -90,7 +88,6 @@ class Game
     (1..12).each do |_|
       puts "Times guessed: #{times_guessed}."
       times_guessed += 1
-      puts code
       guess = player1.player_guess
       g, w  = evaluate_guess(guess, code)
       puts "Green #{g}"
