@@ -27,25 +27,53 @@ class Computer
 
     colors.sample(4)
   end
+
+  def computer_guess
+    guess = []
+    colors = %w[r y g p b m]
+
+    (1..4).each do |_|
+      guess.push(colors.sample)
+    end
+
+    guess
+  end
 end
 
 class Player
-  attr_accessor :guess
+  attr_accessor :guess, :code
 
   def player_guess
-    loop do
-      print 'Guess: '
+    print 'Guess: '
+    prompt_player
+  end
 
+  def prompt_player
+    loop do
       colors = %w[r y g p b m]
 
-      guess = gets.chomp.strip.split(',')
+      input = gets.chomp.strip.split(',')
 
-      if guess.any? { |char| colors.include?(char) } && guess.length == 4
-        return guess
-      else
-        puts 'invalid input'
-      end
+      return input if input.any? { |char| colors.include?(char) } && input.length == 4
+
+      puts 'invalid input'
     end
+  end
+
+  def play_choice
+    loop do
+      print 'Would you like the computer to pick the code or you? '
+      choice = gets.chomp.strip.to_s
+
+      return choice if %w[computer me].include?(choice)
+
+      puts 'Invalid input please type computer or me.'
+    end
+  end
+
+  def player_code
+    print 'Create a code: '
+    prompt_player
   end
 end
 
@@ -80,6 +108,15 @@ class Game
   end
 
   def start
+    choice = player1.play_choice
+    if choice == 'computer'
+      robot_guessing
+    elsif choice == 'me'
+      player_guessing
+    end
+  end
+
+  def player_guessing
     board.display
     board.select_color
     times_guessed = 1
@@ -98,6 +135,28 @@ class Game
         puts "You're now a chad"
         break
       end
+    end
+  end
+
+  def robot_guessing
+    board.display
+    board.select_color
+    code = player1.player_code
+    times_guessed = 1
+    (1..12).each do |_|
+      puts "Times guessed: #{times_guessed}."
+      times_guessed += 1
+      guess = computer.computer_guess
+      g, w  = evaluate_guess(guess, code)
+      puts "Green #{g}"
+      puts "White #{w}"
+      puts guess
+
+      if win?(guess, code)
+        puts 'You lose'
+        break
+      end
+      puts 'You won'
     end
   end
 end
