@@ -1,24 +1,5 @@
 # frozen_string_literal: true
 
-require 'colorize'
-
-class Board
-  attr_accessor :grid
-
-  def initialize
-    self.grid = Array.new(12) { Array.new(4) { '_' } }
-  end
-
-  def display
-    grid.map { |row| row.join(' ') }.each { |row| puts row }
-  end
-
-  def select_color
-    colors = ['•'.red, '•'.yellow, '•'.green, '•'.light_magenta, '•'.blue, '•'.magenta]
-    puts colors.join(' ')
-  end
-end
-
 class Computer
   attr_accessor :code, :possible_codes
 
@@ -85,10 +66,9 @@ class Player
 end
 
 class Game
-  attr_accessor :board, :player1, :computer
+  attr_accessor :player1, :computer
 
   def initialize
-    self.board = Board.new
     self.player1 = Player.new
     self.computer = Computer.new
   end
@@ -124,8 +104,6 @@ class Game
   end
 
   def player_guessing
-    board.display
-    board.select_color
     times_guessed = 1
     code = computer.code_generator
 
@@ -146,8 +124,6 @@ class Game
   end
 
   def robot_guessing
-    board.display
-    board.select_color
     code = player1.player_code
     guess = computer.computer_guess
 
