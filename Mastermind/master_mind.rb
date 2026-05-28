@@ -83,13 +83,24 @@ class Game
     g = 0
     w = 0
 
+    guess_copy = guess.clone
+    code_copy = code.clone
+
     guess.each_with_index do |value, index|
-      if value == code[index]
-        g += 1
-      elsif code.include?(value)
-        w += 1
-      end
+      next unless value == code[index]
+
+      g += 1
+      guess_copy[index] = nil
+      code_copy[index] = nil
     end
+
+    guess_copy.compact.each do |value|
+      next unless code_copy.include?(value)
+
+      w += 1
+      code_copy[code_copy.index(value)] = nil
+    end
+
 
     [g, w]
   end
