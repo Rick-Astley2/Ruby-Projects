@@ -20,23 +20,30 @@ class Board
 end
 
 class Computer
-  attr_accessor :code
+  attr_accessor :code, :possible_codes
+
+  def initialize
+    self.possible_codes = all_codes
+  end
 
   def code_generator
     colors = %w[r y g p b m]
-
     colors.sample(4)
   end
 
-  def computer_guess
-    guess = []
+  def all_codes
     colors = %w[r y g p b m]
+    colors.repeated_permutation(4).to_a
+  end
 
-    (1..4).each do |_|
-      guess.push(colors.sample)
+  def computer_guess
+    possible_codes.sample
+  end
+
+  def filter_possible_codes(last_guess, feedback, game)
+    self.possible_codes = possible_codes.select do |code|
+      game.evaluate_guess(last_guess, code) == feedback
     end
-
-    guess
   end
 end
 
@@ -54,7 +61,7 @@ class Player
 
       input = gets.chomp.strip.split(',')
 
-      return input if input.any? { |char| colors.include?(char) } && input.length == 4
+      return input if input.all? { |char| colors.include?(char) } && input.length == 4
 
       puts 'invalid input'
     end
@@ -142,22 +149,23 @@ class Game
     board.display
     board.select_color
     code = player1.player_code
-    times_guessed = 1
-    (1..12).each do |_|
-      puts "Times guessed: #{times_guessed}."
-      times_guessed += 1
-      guess = computer.computer_guess
-      g, w  = evaluate_guess(guess, code)
+    guess = computer.computer_guess
+
+    (1..12).each do |times|
+      puts "Times guessed: #{times + 1}."
+
+      g, w = evaluate_guess(guess, code)
       puts "Green #{g}"
       puts "White #{w}"
       puts guess
 
-      if win?(guess, code)
-        puts 'You lose'
-        break
-      end
-      puts 'You won'
+      return puts 'You lose' if win?(guess, code)
+
+      computer.filter_possible_codes(guess, [g, w], self)
+
+      guess = computer.computer_guess
     end
+    puts 'You won'
   end
 end
 
