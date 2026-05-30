@@ -2,8 +2,17 @@
 class Display
   
 end
+
 class Player
-  
+  def guess
+    loop do
+      char_guess = gets.chomp.strip.downcase
+
+      return char_guess if char_guess.length == 1 && char_guess.match?(/[a-z]/)
+
+      puts 'Invalid input 1 letter.'
+    end
+  end
 end
 class Computer
   def word
@@ -26,6 +35,7 @@ class Game
 
   def start
     computer.word
+    player.guess
   end
 end
 
