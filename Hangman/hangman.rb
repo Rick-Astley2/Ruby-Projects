@@ -36,19 +36,36 @@ class Computer
   end
 end
 class Game
-  attr_accessor :computer, :player, :display
+  attr_accessor :computer, :player, :display, :used_letters
 
   def initialize
     self.computer = Computer.new
     self.player = Player.new
     self.display = Display.new
+    self.used_letters = []
+  end
+
+  def check_guess?(word, guess)
+    char_list = word.chars
+    puts char_list
+    return false if used_letters.include?(guess)
+
+    if char_list.any? { |char| char == guess }
+      used_letters << guess
+      return true
+    end
+
+    used_letters << guess
+    false
   end
 
   def start
     word = computer.word
-
-    display.create_string(word.length)
-    player.guess
+    loop do
+      display.create_string(word.length)
+      guess = player.guess
+      puts check_guess?(word, guess)
+    end
   end
 end
 
