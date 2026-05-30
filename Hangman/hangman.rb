@@ -2,14 +2,8 @@
 class Display
   attr_accessor :num
 
-  def initialize
-    self.num = num
-  end
-
-  def create_string(num)
-    string = Array.new(num) { '_' }
-
-    puts string.join(' ')
+  def create_word_bar(num)
+    Array.new(num) { '_' }
   end
 end
 
@@ -36,35 +30,40 @@ class Computer
   end
 end
 class Game
-  attr_accessor :computer, :player, :display, :used_letters
+  attr_accessor :computer, :player, :display, :used_letters, :guess_count
 
   def initialize
     self.computer = Computer.new
     self.player = Player.new
     self.display = Display.new
     self.used_letters = []
+    self.guess_count = 0
   end
 
-  def check_guess?(word, guess)
+  def check_guess?(word, guess, word_bar)
     char_list = word.chars
-    puts char_list
-    return false if used_letters.include?(guess)
-
-    if char_list.any? { |char| char == guess }
+    if char_list.include?(guess)
+      char_list.each_with_index do |letter, index|
+        word_bar[index] = guess if letter == guess
+      end
       used_letters << guess
-      return true
+    else
+      used_letters << guess
+      self.guess_count += 1
     end
 
-    used_letters << guess
-    false
+    puts 'you won' if word_bar.all? { |char| char != '_' }
   end
 
   def start
     word = computer.word
-    loop do
-      display.create_string(word.length)
+    word_bar = display.create_word_bar(word.strip.length)
+    while guess_count < 6
+      puts "Misses: #{guess_count}"
+      puts word_bar.join(' ')
       guess = player.guess
-      puts check_guess?(word, guess)
+      check_guess?(word, guess, word_bar)
+      puts used_letters.join(' ')
     end
   end
 end
