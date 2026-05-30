@@ -24,7 +24,10 @@ class Computer
 
     word_list = []
 
-    full_word_list.each { |line| word_list << line if line.length.between?(5, 12) }
+    full_word_list.each do |line|
+      line = line.chomp
+      word_list << line if line.length.between?(5, 12)
+    end
 
     word_list.sample
   end
@@ -46,25 +49,28 @@ class Game
       char_list.each_with_index do |letter, index|
         word_bar[index] = guess if letter == guess
       end
-      used_letters << guess
-    else
-      used_letters << guess
+    elsif !used_letters.include?(guess)
       self.guess_count += 1
     end
 
-    puts 'you won' if word_bar.all? { |char| char != '_' }
+    used_letters << guess unless used_letters.include?(guess)
+    word_bar.all? { |char| char != '_' }
   end
 
   def start
     word = computer.word
-    word_bar = display.create_word_bar(word.strip.length)
+    word_bar = display.create_word_bar(word.length)
     while guess_count < 6
       puts "Misses: #{guess_count}"
       puts word_bar.join(' ')
       guess = player.guess
-      check_guess?(word, guess, word_bar)
       puts used_letters.join(' ')
+      if check_guess?(word, guess, word_bar)
+        puts 'you won'
+        break
+      end
     end
+    puts "The word was #{word}"
   end
 end
 
