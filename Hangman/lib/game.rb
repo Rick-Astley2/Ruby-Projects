@@ -1,40 +1,11 @@
 # frozen_string_literal: true
 
 require 'yaml'
-class Display
-  attr_accessor :num
+require_relative 'player'
+require_relative 'game'
+require_relative 'display'
 
-  def create_word_bar(num)
-    Array.new(num) { '_' }
-  end
-end
-
-class Player
-  def guess
-    loop do
-      char_guess = gets.chomp.strip.downcase
-
-      return char_guess if char_guess == 'save'
-      return char_guess if char_guess.length == 1 && char_guess.match?(/[a-z]/)
-
-      puts 'Invalid input 1 letter.'
-    end
-  end
-end
-class Computer
-  def word
-    full_word_list = File.open 'google-10000-english-no-swears.txt', 'r'
-
-    word_list = []
-
-    full_word_list.each do |line|
-      line = line.chomp
-      word_list << line if line.length.between?(5, 12)
-    end
-
-    word_list.sample
-  end
-end
+# Handles starting, loading, and saving the game
 class Game
   attr_accessor :computer, :player, :display, :used_letters, :guess_count, :word, :word_bar
 
@@ -111,10 +82,3 @@ class Game
     File.delete('hang_man_save.yml') if File.exist?('hang_man_save.yml')
   end
 end
-
-def main
-  game = Game.new
-  game.start
-end
-
-main
