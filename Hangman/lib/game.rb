@@ -4,6 +4,7 @@ require 'yaml'
 require_relative 'player'
 require_relative 'game'
 require_relative 'display'
+require_relative 'computer'
 
 # Handles starting, loading, and saving the game
 class Game
@@ -61,24 +62,26 @@ class Game
       self.word_bar = display.create_word_bar(word.length)
     end
 
-    while guess_count < 6
-      puts "Misses: #{guess_count}"
-      puts word_bar.join(' ')
-      puts used_letters.join(' ')
+    while guess_count < 7
+      puts "#{guess_count} of 6 incorrect Guesses left."
+      puts "Used letters: #{used_letters.join(' ')}"
+      puts "\n #{word_bar.join(' ')}"
 
       guess = player.guess
       if guess == 'save'
         save_game
         return
       end
+
       next unless check_guess?(word, guess, word_bar)
 
+      puts word_bar.join(' ')
       puts 'you won'
       File.delete('hang_man_save.yml') if File.exist?('hang_man_save.yml')
       break
-    end
 
-    puts "The word was #{word}"
+    end
+    puts "The word is #{word}"
     File.delete('hang_man_save.yml') if File.exist?('hang_man_save.yml')
   end
 end

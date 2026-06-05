@@ -4,6 +4,7 @@
 class Player
   def guess
     loop do
+      print "\n Guess: "
       char_guess = gets.chomp.strip.downcase
 
       return char_guess if char_guess == 'save'
