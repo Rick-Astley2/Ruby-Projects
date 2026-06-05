@@ -14,7 +14,7 @@ class Player
     loop do
       char_guess = gets.chomp.strip.downcase
 
-      return input if input == 'save'
+      return char_guess if char_guess == 'save'
       return char_guess if char_guess.length == 1 && char_guess.match?(/[a-z]/)
 
       puts 'Invalid input 1 letter.'
@@ -53,14 +53,14 @@ class Game
       used_letters: used_letters,
       guess_count: guess_count
     }
-    File.write('file_name.yml', YAML.dump(data))
+    File.write('hang_man_save.yml', YAML.dump(data))
     puts 'Saved'
   end
 
   def load_game
-    return false unless File.exist?('file_name.yml')
+    return false unless File.exist?('hang_man_save.yml')
 
-    data = YAML.load_file('file_name.yml')
+    data = YAML.load_file('hang_man_save.yml')
 
     self.word = data[:word]
     self.word_bar = data[:word_bar]
@@ -85,19 +85,30 @@ class Game
   end
 
   def start
-    word = computer.word
-    word_bar = display.create_word_bar(word.length)
+    unless load_game
+      self.word = computer.word
+      self.word_bar = display.create_word_bar(word.length)
+    end
+
     while guess_count < 6
       puts "Misses: #{guess_count}"
       puts word_bar.join(' ')
-      guess = player.guess
       puts used_letters.join(' ')
-      if check_guess?(word, guess, word_bar)
-        puts 'you won'
-        break
+
+      guess = player.guess
+      if guess == 'save'
+        save_game
+        return
       end
+      next unless check_guess?(word, guess, word_bar)
+
+      puts 'you won'
+      File.delete('hang_man_save.yml') if File.exist?('hang_man_save.yml')
+      break
     end
+
     puts "The word was #{word}"
+    File.delete('hang_man_save.yml') if File.exist?('hang_man_save.yml')
   end
 end
 
