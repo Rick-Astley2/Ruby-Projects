@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+
+require 'yaml'
 class Display
   attr_accessor :num
 
@@ -12,6 +14,7 @@ class Player
     loop do
       char_guess = gets.chomp.strip.downcase
 
+      return input if input == 'save'
       return char_guess if char_guess.length == 1 && char_guess.match?(/[a-z]/)
 
       puts 'Invalid input 1 letter.'
@@ -33,7 +36,7 @@ class Computer
   end
 end
 class Game
-  attr_accessor :computer, :player, :display, :used_letters, :guess_count
+  attr_accessor :computer, :player, :display, :used_letters, :guess_count, :word, :word_bar
 
   def initialize
     self.computer = Computer.new
@@ -41,6 +44,30 @@ class Game
     self.display = Display.new
     self.used_letters = []
     self.guess_count = 0
+  end
+
+  def save_game
+    data = {
+      word: word,
+      word_bar: word_bar,
+      used_letters: used_letters,
+      guess_count: guess_count
+    }
+    File.write('file_name.yml', YAML.dump(data))
+    puts 'Saved'
+  end
+
+  def load_game
+    return false unless File.exist?('file_name.yml')
+
+    data = YAML.load_file('file_name.yml')
+
+    self.word = data[:word]
+    self.word_bar = data[:word_bar]
+    self.used_letters = data[:used_letters]
+    self.guess_count = data[:guess_count]
+
+    true
   end
 
   def check_guess?(word, guess, word_bar)
